@@ -19,15 +19,21 @@ map.addControl(drawControl);
 
 var startMarker, endMarker, trail;
 
+
+// on location found
 function success(pos) {
     const lat = pos.coords.latitude;
     const lng = pos.coords.longitude;
     const accuracy = pos.coords.accuracy;
 
+    // Set map view to the current location
+    map.setView([lat, lng], 17);
+
     // Add a marker for the current location
     L.marker([lat, lng]).addTo(map);
 }
 
+// on error location found
 function error(err) {
     if (err.code == 1) {
         alert('Please allow geolocation access');
