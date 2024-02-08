@@ -64,6 +64,7 @@ function setEndLocation() {
     });
 }
 
+
 // Function to handle drawing a trail
 function drawTrail() {
     map.off('draw:created'); // Remove any existing draw event listener
@@ -74,9 +75,20 @@ function drawTrail() {
                 map.removeLayer(trail);
             }
             trail = e.layer.addTo(map);
+
+            // Capture the coordinates of the start and end markers
+            var startCoords = startMarker.getLatLng();
+            var endCoords = endMarker.getLatLng();
+
+            // Display start and end coordinates in a div
+            document.getElementById('startCoords').innerText = 'Start Coordinates: ' + startCoords.toString();
+            document.getElementById('endCoords').innerText = 'End Coordinates: ' + endCoords.toString();
         }
     });
 }
+
+
+
 
 
 
