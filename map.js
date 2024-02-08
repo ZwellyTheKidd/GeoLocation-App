@@ -1,47 +1,76 @@
 var map = L.map('map');
 map.setView([51.505, -0.09], 13);
 
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+// Add OpenStreetMap tile layer
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
+// Initialize the Leaflet.draw control
+var drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
+var drawControl = new L.Control.Draw({
+    edit: {
+        featureGroup: drawnItems
+    }
+});
+map.addControl(drawControl);
 
-navigator.geolocation.watchPosition(success, error);
-
-let marker,circle,zoomed;
+var startMarker, endMarker, trail;
 
 function success(pos) {
-
     const lat = pos.coords.latitude;
     const lng = pos.coords.longitude;
     const accuracy = pos.coords.accuracy;
 
-    if(marker){
-        map.removeLayer(marker);
-        map.removeLayer(circle);
-    }
-
-    marker = L.marker([lat,lng]).addTo(map);
-    circle= L.circle([lat,lng],{ radius: accuracy}).addTo(map);
-
-    if (!zoomed) {
-        zoomed=map.fitBounds(circle.getBounds());
-    }
-
-    map.setView([lat,lng]);
-  
-
+    // Add a marker for the current location
+    L.marker([lat, lng]).addTo(map);
 }
 
-function error(err){
-
-    if(err.code==1){
+function error(err) {
+    if (err.code == 1) {
         alert('Please allow geolocation access');
     }
 }
 
+navigator.geolocation.watchPosition(success, error);
 
+// Function to handle setting the start location
+function setStartLocation() {
+    map.off('click'); // Remove any existing click event listener
+    map.on('click', function(e) {
+        if (startMarker) {
+            map.removeLayer(startMarker);
+        }
+        startMarker = L.marker(e.latlng).addTo(map);
+    });
+}
+
+// Function to handle setting the end location
+function setEndLocation() {
+    map.off('click'); // Remove any existing click event listener
+    map.on('click', function(e) {
+        if (endMarker) {
+            map.removeLayer(endMarker);
+        }
+        endMarker = L.marker(e.latlng).addTo(map);
+    });
+}
+
+// Function to handle drawing a trail
+function drawTrail() {
+    map.off('draw:created'); // Remove any existing draw event listener
+    map.on('draw:created', function(e) {
+        var type = e.layerType;
+        if (type === 'polyline') {
+            if (trail) {
+                map.removeLayer(trail);
+            }
+            trail = e.layer.addTo(map);
+        }
+    });
+}
 
 
 
@@ -70,3 +99,5 @@ function searchLocation() {
         alert('Error fetching location. Please try again later.');
     });
 }
+
+
