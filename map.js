@@ -30,6 +30,13 @@ function error(err) {
 navigator.geolocation.watchPosition(success, error);
 
 
+// Function to handle key press event
+function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+        searchLocation();
+    }
+}
+
 // Function to search for a location
 function searchLocation() {
     var searchText = document.getElementById('searchInput').value;
@@ -38,23 +45,33 @@ function searchLocation() {
         return;
     }
 
+     // Show the searchedLocation div and hide the currentLocation div
+     document.querySelector('.SearchResults').classList.remove('hidden');
+     document.querySelector('.currentLocation').classList.add('hidden');
+     document.querySelector('.locationHeader').classList.add('hidden');
+    
+
     // Use a geocoding service to convert location name into coordinates
     fetch(`https://nominatim.openstreetmap.org/search?q=${searchText}&format=json`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.length > 0) {
-                var lat = parseFloat(data[0].lat);
-                var lon = parseFloat(data[0].lon);
-                map.setView([lat, lon], 13); // Set map view to the found coordinates
-            } else {
-                alert('Location not found');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching location:', error);
-            alert('Error fetching location. Please try again later.');
-        });
+    .then(response => response.json())
+    .then(data => {
+        if (data.length > 0) {
+            var lat = parseFloat(data[0].lat);
+            var lon = parseFloat(data[0].lon);
+            map.setView([lat, lon], 13); // Set map view to the found coordinates
+
+        // Call displaySearchedLocation to update the searchedLocation div
+        displaySearchedLocation(lat, lon);
+        } else {
+            alert('Location not found');
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching location:', error);
+        alert('Error fetching location. Please try again later.');
+    });
 }
+
 
 // Function to get current location and update the div content
 function getCurrentLocation() {
@@ -88,6 +105,29 @@ function displayCoords(e) {
 }
 
 map.on('click', displayCoords);
+
+
+// Function to display the searched location
+function displaySearchedLocation(latitude, longitude) {
+    var searchedLocationDiv = document.querySelector('.searchedLocation');
+
+    // Fetching address information using OpenStreetMap Nominatim API
+    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
+        .then(response => response.json())
+        .then(data => {
+            var city = data.address.city || '';
+            var province = data.address.state || '';
+            var country = data.address.country || '';
+            searchedLocationDiv.textContent = `${city}, ${province}, ${country}`;
+        })
+        .catch(error => {
+            console.error('Error fetching location:', error);
+            searchedLocationDiv.textContent = 'Error fetching location';
+        });
+}
+
+// Example usage:
+
 
 
 
