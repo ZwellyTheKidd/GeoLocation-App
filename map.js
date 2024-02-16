@@ -27,7 +27,7 @@ function error(err) {
     }
 }
 
-navigator.geolocation.watchPosition(success, error);
+navigator.geolocation.getCurrentPosition(success, error);
 
 
 // Function to handle key press event
