@@ -98,10 +98,33 @@ function getCurrentLocation() {
 
 getCurrentLocation();
 
+
+
+
+// Get reference to the .coords div
+const coordsDiv = document.querySelector('.coords');
+
+// Get reference to the #mapMessage span
+const mapMessageSpan = document.getElementById('mapMessage');
+
+// Function to check if .coords div is empty and hide the #mapMessage span if it's not
+function checkCoordsDiv() {
+    if (coordsDiv.innerHTML.trim() !== '') {
+        // Hide the #mapMessage span
+        mapMessageSpan.style.display = 'none';
+    }
+}
+
+// Call checkCoordsDiv function initially
+checkCoordsDiv();
+
 // Function to display coordinates of clicked location
 function displayCoords(e) {
     var coordsDiv = document.querySelector('.coords');
     coordsDiv.textContent = `(${e.latlng.lat.toFixed(6)},${e.latlng.lng.toFixed(6)})`;
+    
+    // Check if .coords div is not empty and hide the #mapMessage span
+    checkCoordsDiv();
 }
 
 map.on('click', displayCoords);
@@ -127,7 +150,5 @@ function displaySearchedLocation(latitude, longitude) {
 }
 
 // Example usage:
-
-
 
 
